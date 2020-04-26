@@ -54,9 +54,10 @@ def purge_city(output, city, curr_day, level, isolated_nodes):
                 u = bfs_queue.popleft()
                 subnodes_to_isolate = []
                 for sub_key in u.edge_dict.keys():
-                    if u.edge_dict[sub_key][-1][0] >= u.inf_start_time:
+                    if not u.is_infected():
                         subnodes_to_isolate.append(sub_key)
-
+                    elif u.edge_dict[sub_key][-1][0] >= u.inf_start_time:
+                        subnodes_to_isolate.append(sub_key)
                 for trg_node_ptr in subnodes_to_isolate:
                     trg_node = city.nodes[trg_node_ptr]
                     if not trg_node.visited and trg_node.not_isolated():

@@ -24,7 +24,6 @@ def bfs(city, inf_node, curr_day):
         for trg_node_ptr in curr_day_contact_keys:
             trg_node = city.nodes[trg_node_ptr]
             if not trg_node.visited and trg_node.not_isolated():
-                print("Current day before prob: ", curr_day)
                 attach_prob(u, trg_node, curr_day, city)
                 if trg_node.is_infected(): bfs_queue.append(trg_node)
                 trg_node.visited = True
@@ -52,9 +51,9 @@ def infect_city(init_cond, city, curr_day, algo_mode):
         # infected_sample = random.sample(existing_nodes, k=min(INITIAL_INF_POP, len(existing_nodes)))
 
         for node in infected_sample:
-            node.day_of_isolation = curr_day
+            node.day_of_isolation = curr_day + 3
             node.inf_prob = 1
-            node.inf_start_time = (curr_day * 1000)
+            node.inf_start_time = (curr_day -1) * 1000
             node.status = 'infected'
             city.healthy -= 1
             city.infected += 1

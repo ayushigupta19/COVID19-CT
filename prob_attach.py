@@ -5,15 +5,19 @@ def attach_prob(src, trg, curr_day, city):
     print(f"Day {curr_day} :: attaching prob for source ({src}, {src.status}) and ({trg}, {trg.status})")
     print("reversed edge dict is: ", reversed(trg.edge_dict[src.id]))
 
-    if src.inf_start_time and not trg.is_infected():
+    if src.inf_start_time is not None and not trg.is_infected():
         for contact in reversed(trg.edge_dict[src.id]):
+            print("contact[0] is ", contact[0])
+            print("src inf time ", src.inf_start_time)
             if contact[0] < src.inf_start_time:
+                print("first loop")
                 break
             else:
-                prob = min(1, src.inf_prob / 2)
+                prob = min(1, src.inf_prob/2)
                 trg.inf_prob = prob
                 trg.mark_infection(curr_day, contact[0], city)
                 if trg.is_infected():
+                    print("Target node infected")
                     break
 
     
