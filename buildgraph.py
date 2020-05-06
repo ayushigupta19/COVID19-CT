@@ -1,7 +1,6 @@
 from geopy.distance import geodesic
 # from params import RADIUS
 import pandas as pd
-import timeit
 
 RADIUS = 20
 
@@ -32,13 +31,16 @@ class Graph:
 def create_node(id):
     return Node(id=id)
 
-def build_graph(path="input_file.csv"):
+def average(x1, x2):
+    return (x1 + x2)/2
+
+def build_graph(path="results_static_data.csv"):
     graph = Graph()
-    df = pd.read_csv(path, header =0, names=['id', 'x', 'y', 't_start', 't_end', 'confi'])
+    df = pd.read_csv(path, header = None, names=['id', 'x', 'y', 't_start', 't_end', 'confi'])
     f = open("results.txt", "w")
     f.write("")
     f.close()
-    for idx, entry in df.iterrows():
+    for _, entry in df.iterrows():
         # print(entry['id'])
         if entry['id'] not in graph.nodes.keys():
             graph.nodes[entry['id']] = create_node(entry['id'])
@@ -55,23 +57,25 @@ def build_graph(path="input_file.csv"):
                             time = (entry['t_start'], entry['t_end'])
                             confidence = entry['confi'] * interval[1][2]
                             graph.create_edge(node.id, entry['id'], time, dist, confidence)
-                            
+                            x_avg = average(entry['x'], interval[1][0])
+                            y_avg = average(entry['y'], interval[1][1])
                             f = open("results.txt", "a")
-                            f.write("{0},{1},{2},{3},{4}\n".format(node.id, entry['id'], time, dist, confidence))
+                            f.write("{0},{1},{2},{3},{4},{5},{6},{7}\n".format(entry['id'], node.id, x_avg, y_avg, time[0], time[1], confidence, dist))
                             f.close()
                             print("added edge between: ", node.id, entry['id'], " time interval: ", time)
 
                     elif interval[0][0] >= entry['t_start'] and interval[0][1] <= entry['t_end']:
                         dist = geodesic((entry['y'], entry['x']), (interval[1][1], interval[1][0])).meters 
                         if dist <= RADIUS:
-                            time = interval[0]
+                            time = (interval[0][0], interval[0][1])
                             confidence = entry['confi'] * interval[1][2]
                             graph.create_edge(node.id, entry['id'], time, dist, confidence)
-                            
-                            f = open("results.txt", "a")
-                            f.write("{0},{1},{2},{3},{4}\n".format(node.id, entry['id'], time, dist, confidence))
-                            f.close()
-                            print("added edge between: ", node.id, entry['id'])
+                            x_avg = average(entry['x'], interval[1][0])
+                            y_avg = average(entry['y'], interval[1][1])
 
-elapsed_time = timeit.timeit(build_graph("input_file.csv"), number=1)
-print("Time taken: ", elapsed_time)
+                            f = open("results.txt", "a")
+                            f.write("{0},{1},{2},{3},{4},{5},{6},{7}\n".format(entry['id'], node.id, x_avg, y_avg, time[0], time[1], confidence, dist))
+                            f.close()
+                            print("added edge between: ", node.id, entry['id'], " time interval: ", time)
+
+build_graph("results_static_data.csv")
